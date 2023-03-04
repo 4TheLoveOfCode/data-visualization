@@ -1,13 +1,16 @@
 import Head from "next/head";
 import Image from "next/image";
-import { AppShell, Header } from "@mantine/core";
+import { AppShell, Header, Title } from "@mantine/core";
 import OECSearchBar from "@/components/oec-searchbar";
 import { useRouter } from "next/router";
 import TradeChart, { TradeType } from "@/components/trade-chart";
+import { fetchData, getCountryName } from "@/utils";
+import CountryTradeVisualizer from "@/components/country-trade-visualizer";
 
-export default function Home() {
+function Index(props) {
   const router = useRouter();
-  const { country, year } = router.query;
+  const { country } = router.query;
+  const { countries } = props;
 
   return (
     <>
@@ -22,7 +25,7 @@ export default function Home() {
       </Head>
       <AppShell
         padding="md"
-        navbar={<OECSearchBar />}
+        navbar={<OECSearchBar countries={countries} />}
         header={
           <Header height={60} p="xs">
             <Image src="/oec.svg" alt="oec" width="70" height="24" />
@@ -34,25 +37,32 @@ export default function Home() {
               theme.colorScheme === "dark"
                 ? theme.colors.dark[8]
                 : theme.colors.gray[0],
+            paddingRight: 16,
           },
         })}
       >
-        {country && (
-          <TradeChart
-            year={year}
-            country={country}
-            tradeType={TradeType.Export}
-          />
-        )}
-
-        {country && (
-          <TradeChart
-            year={year}
-            country={country}
-            tradeType={TradeType.Import}
-          />
-        )}
+        {country && <CountryTradeVisualizer countries={countries} />}
       </AppShell>
     </>
   );
 }
+
+const countriesUrl = `https://oec.world/olap-proxy/members?cube=trade_i_baci_a_92&level=Country&locale=en`;
+
+export async function getServerSideProps(context) {
+  let countries;
+
+  try {
+    countries = (await fetchData(countriesUrl)).data;
+  } catch (e) {
+    console.log(e);
+  }
+
+  return {
+    props: {
+      countries,
+    },
+  };
+}
+
+export default Index;

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useDebounce, useFetch } from "usehooks-ts";
-import { Anchor, List, Navbar, TextInput } from "@mantine/core";
+import { useRouter } from "next/router";
+import { Anchor, List, Navbar, TextInput, CloseButton } from "@mantine/core";
+import { getCountryName } from "@/utils";
 
 const countriesUrl = `https://oec.world/olap-proxy/members?cube=trade_i_baci_a_92&level=Country&locale=en`;
 
@@ -11,12 +13,12 @@ const filterCountries = (countries, searchText) => {
   });
 };
 
-const OECSearchBar = () => {
-  // I thought about using getServerSideProps from the index page,
-  // and pass the countries as props here, but at the end I preferreed this approach
+const OECSearchBar = ({ countries }) => {
+  const router = useRouter();
+  const { country } = router.query;
 
   const { data: oecCountries, error } = useFetch(countriesUrl);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(getCountryName(countries, country));
   const [filteredCountries, setFilteredCountries] = useState([]);
   const debouncedSearch = useDebounce(search, 300);
 
@@ -36,6 +38,17 @@ const OECSearchBar = () => {
         value={search}
         onChange={handleSearchChange}
         disabled={!Boolean(oecCountries) || Boolean(error)}
+        rightSection={
+          Boolean(search) ? (
+            <CloseButton
+              title="Clear"
+              size="sm"
+              onClick={() => {
+                setSearch("");
+              }}
+            />
+          ) : null
+        }
       />
       <List
         sx={{
@@ -44,7 +57,7 @@ const OECSearchBar = () => {
       >
         {filteredCountries.map((country) => (
           <List.Item key={country.ID}>
-            <Anchor href={`/?country=${country.ID}`}>
+            <Anchor href={`/?country=${country.ID}&year=2020`}>
               {country["EN Label"]}
             </Anchor>
           </List.Item>
