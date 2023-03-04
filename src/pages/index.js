@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
-import { AppShell, Header, Title } from "@mantine/core";
+import { Anchor, AppShell, Header, Center, Text } from "@mantine/core";
 import OECSearchBar from "@/components/oec-searchbar";
 import { useRouter } from "next/router";
 import TradeChart, { TradeType } from "@/components/trade-chart";
@@ -28,7 +28,9 @@ function Index(props) {
         navbar={<OECSearchBar countries={countries} />}
         header={
           <Header height={60} p="xs">
-            <Image src="/oec.svg" alt="oec" width="70" height="24" />
+            <Anchor href="/">
+              <Image src="/oec.svg" alt="oec" width="105" height="36" />
+            </Anchor>
           </Header>
         }
         styles={(theme) => ({
@@ -41,7 +43,16 @@ function Index(props) {
           },
         })}
       >
-        {country && <CountryTradeVisualizer countries={countries} />}
+        {country ? (
+          <CountryTradeVisualizer countries={countries} />
+        ) : (
+          <Center maw={400} h={100} mx="auto">
+            <Text fz="xl" ta="center">
+              Type in the searchbar to check a country&apos;s National Trade
+              Data
+            </Text>
+          </Center>
+        )}
       </AppShell>
     </>
   );
