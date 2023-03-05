@@ -3,8 +3,7 @@ import Image from "next/image";
 import { Anchor, AppShell, Header, Center, Text } from "@mantine/core";
 import OECSearchBar from "@/components/oec-searchbar";
 import { useRouter } from "next/router";
-import TradeChart, { TradeType } from "@/components/trade-chart";
-import { fetchData, getCountryName } from "@/utils";
+import { fetchData } from "@/utils";
 import CountryTradeVisualizer from "@/components/country-trade-visualizer";
 
 function Index(props) {
